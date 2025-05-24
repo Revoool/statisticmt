@@ -79,14 +79,6 @@ with tab1:
         "Изменение цены % (recalc)"
     ]])
 
-    fig = px.bar(
-        filtered,
-        x="title",
-        y="Изменение цены % (recalc)",
-        title="Изменение цены (%) по товарам",
-        labels={"Изменение цены % (recalc)": "% изменения"},
-    )
-    st.plotly_chart(fig)
 
 with tab2:
     st.title("📊 Итоги по подкатегориям")
