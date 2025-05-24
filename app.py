@@ -84,7 +84,7 @@ with tab1:
         x="title",
         y="Изменение цены % (recalc)",
         title="Изменение цены (%) по товарам",
-        labels={"Изменение цены % (recalc)": "% изменения"},
+        labels={"Изменение цены % (recalc)": "% изменения"%},
     )
     st.plotly_chart(fig)
 
