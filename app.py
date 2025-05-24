@@ -21,6 +21,7 @@ column_names += ["всего проданно товара", "Закупочна
 
 df = pd.read_csv("Summar - Общая сводная.csv", names=column_names, skiprows=1)
 
+# Очистка числовых полей
 def parse_price(value):
     try:
         return float(str(value).replace("грн.", "").replace(",", ".").replace(" ", "").strip())
@@ -30,6 +31,9 @@ def parse_price(value):
 price_columns = [col for col in df.columns if "_цена" in col]
 for col in price_columns:
     df[col] = df[col].apply(parse_price)
+
+# ВАЖНО: очищаем поле Итого продаж
+df["Итого продаж"] = df["Итого продаж"].apply(parse_price)
 
 def get_first_price(row):
     for col in price_columns:
