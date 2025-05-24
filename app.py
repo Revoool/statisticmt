@@ -32,8 +32,9 @@ price_columns = [col for col in df.columns if "_цена" in col]
 for col in price_columns:
     df[col] = df[col].apply(parse_price)
 
-# ВАЖНО: очищаем поле Итого продаж
 df["Итого продаж"] = df["Итого продаж"].apply(parse_price)
+df["Средняя цена продажи"] = df["Средняя цена продажи"].apply(parse_price)
+
 
 def get_first_price(row):
     for col in price_columns:
