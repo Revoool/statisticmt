@@ -241,7 +241,7 @@ with tab4:
             grouped_suppliers["Средняя_цена_продажи"] - grouped_suppliers["Средняя_закупка"]
         ).round(2)
 
-        st.markdown("### 🧮 Топ-10 поставщиков по средней марже")
+        st.markdown("### Топ-10 поставщиков по средней марже")
         fig_margins = px.bar(
             grouped_suppliers.sort_values("Средняя_маржа", ascending=False).head(10),
             x="Поставщик",
@@ -254,7 +254,7 @@ with tab4:
         selected_vendor = st.selectbox("Выберите поставщика", df_sup["Поставщик"].unique())
         st.dataframe(df_sup[df_sup["Поставщик"] == selected_vendor])
 
-        st.markdown("### 💰 Топ-20 поставщиков по выручке")
+        st.markdown("### Топ-20 поставщиков по выручке")
         st.dataframe(grouped_suppliers.sort_values("Сумма_продаж", ascending=False))
 
         fig_supplier_profit = px.bar(
