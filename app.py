@@ -211,8 +211,8 @@ with tab3:
     )
     st.plotly_chart(fig5, use_container_width=True)
 
-with st.tab("Итоги по поставщикам"):
-    st.title("Итоги по поставщикам")
+with tab4:
+    st.title("📦 Итоги по поставщикам")
 
     df_suppliers = df.dropna(subset=["Поставщик"])
 
