@@ -214,26 +214,57 @@ with tab3:
 with tab4:
     st.title("📦 Итоги по поставщикам")
 
-    df_suppliers = df.dropna(subset=["Поставщик"])
+    try:
+        df_sup = pd.read_csv("Summar - Общая сводная.csv", sep=",", dtype=str)
 
-    grouped_suppliers = df_suppliers.groupby("Поставщик").agg(
-        Товаров=("Артикул", "count"),
-        Сумма_продаж=("Итого продаж", "sum"),
-        Средняя_цена_продажи=("Средняя цена продажи", "mean"),
-        Средняя_закупка=("закупочная цена", "mean"),
-    ).reset_index()
+        # Чистим цены
+        def parse_price(val):
+            try:
+                return float(str(val).replace("грн.", "").replace(",", ".").replace(" ", "").strip())
+            except:
+                return None
 
-    grouped_suppliers["Средняя_маржа"] = (
-        grouped_suppliers["Средняя_цена_продажи"] - grouped_suppliers["Средняя_закупка"]
-    ).round(2)
+        df_sup["Итого продаж"] = df_sup["Итого продаж"].apply(parse_price)
+        df_sup["Средняя цена продажи"] = df_sup["Средняя цена продажи"].apply(parse_price)
+        df_sup["закупочная цена"] = df_sup["закупочная цена"].apply(parse_price)
 
-    st.dataframe(grouped_suppliers.sort_values("Сумма_продаж", ascending=False))
+        df_sup = df_sup.dropna(subset=["Поставщик"])
+        
+        grouped_suppliers = df_sup.groupby("Поставщик").agg(
+            Товаров=("Артикул", "count"),
+            Сумма_продаж=("Итого продаж", "sum"),
+            Средняя_цена_продажи=("Средняя цена продажи", "mean"),
+            Средняя_закупка=("закупочная цена", "mean"),
+        ).reset_index()
 
-    fig_supplier_profit = px.bar(
-        grouped_suppliers.sort_values("Сумма_продаж", ascending=False).head(20),
-        x="Поставщик",
-        y="Сумма_продаж",
-        title="💰 Топ-20 поставщиков по выручке",
-        labels={"Сумма_продаж": "грн"},
-    )
-    st.plotly_chart(fig_supplier_profit)
+        grouped_suppliers["Средняя_маржа"] = (
+            grouped_suppliers["Средняя_цена_продажи"] - grouped_suppliers["Средняя_закупка"]
+        ).round(2)
+
+        st.markdown("### 🧮 Топ-10 поставщиков по средней марже")
+        fig_margins = px.bar(
+            grouped_suppliers.sort_values("Средняя_маржа", ascending=False).head(10),
+            x="Поставщик",
+            y="Средняя_маржа",
+            title="🏆 Средняя маржа по поставщикам",
+            labels={"Средняя_маржа": "грн"},
+        )
+        st.plotly_chart(fig_margins)
+
+        selected_vendor = st.selectbox("Выберите поставщика", df_sup["Поставщик"].unique())
+        st.dataframe(df_sup[df_sup["Поставщик"] == selected_vendor])
+
+        st.markdown("### 💰 Топ-20 поставщиков по выручке")
+        st.dataframe(grouped_suppliers.sort_values("Сумма_продаж", ascending=False))
+
+        fig_supplier_profit = px.bar(
+            grouped_suppliers.sort_values("Сумма_продаж", ascending=False).head(20),
+            x="Поставщик",
+            y="Сумма_продаж",
+            title="💰 Топ-20 поставщиков по выручке",
+            labels={"Сумма_продаж": "грн"},
+        )
+        st.plotly_chart(fig_supplier_profit)
+
+    except Exception as e:
+        st.error(f"Ошибка при обработке данных по поставщикам: {e}")
