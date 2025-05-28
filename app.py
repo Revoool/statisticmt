@@ -76,11 +76,16 @@ with tab1:
     st.title("📈 Анализ изменения цен")
 
     if "subcategory" not in df.columns:
-        st.error("❌ Колонка 'subcategory' не найдена.")
+        st.error("Колонка 'subcategory' не найдена.")
         st.stop()
 
     subcat = st.selectbox("Подкатегория", df["subcategory"].dropna().unique())
     filtered = df[df["subcategory"] == subcat]
+
+    if "Поставщик" in filtered.columns:
+        suppliers = filtered["Поставщик"].dropna().unique()
+        supplier = st.selectbox("Поставщик", suppliers)
+        filtered = filtered[filtered["Поставщик"] == supplier]
 
     expected_cols = [
         "Артикул", 
