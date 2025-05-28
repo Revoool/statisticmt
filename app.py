@@ -351,50 +351,64 @@ with tab5:
     st.plotly_chart(fig_vendor_down, use_container_width=True)
 
 
-    with tab6:
-        st.title("📋 Анализ по поставщикам")
+with tab6:
+    st.title("📋 Анализ по поставщикам")
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Всего уникальных товаров", df["Артикул"].nunique())
-        col2.metric("Суммарная выручка", f"{df['Итого продаж'].sum():,.0f} грн")
-        col3.metric("Средняя цена продажи", f"{df['Средняя цена продажи'].mean():.2f} грн")
-
-        st.markdown("### 📦 Количество товаров по категориям")
-        category_counts = df["category"].value_counts().reset_index()
-        category_counts.columns = ["Категория", "Количество"]
-
-        fig_category = px.bar(
-            category_counts.sort_values("Количество", ascending=False),
-            x="Категория",
-            y="Количество",
-            title="Количество товаров по категориям",
+    def clean_price_column(series):
+        return (
+            series.astype(str)
+            .str.replace(",", ".", regex=False)
+            .str.replace(r"[^\d\.]", "", regex=True)
+            .replace("", float("nan"))
+            .astype(float)
         )
-        st.plotly_chart(fig_category, use_container_width=True)
 
-        st.markdown("### 💰 Средняя закупочная vs. продажная цена по подкатегориям")
-        by_subcat = df.groupby("subcategory").agg(
-            Средняя_цена_продажи=("Средняя цена продажи", "mean"),
-            Средняя_закупка=("закупочная цена", "mean")
-        ).dropna().round(2).reset_index()
+    df["Средняя цена продажи"] = clean_price_column(df["Средняя цена продажи"])
+    df["закупочная цена"] = clean_price_column(df["закупочная цена"])
 
-        fig_prices = px.bar(
-            by_subcat.melt(id_vars="subcategory", value_vars=["Средняя_цена_продажи", "Средняя_закупка"]),
-            x="subcategory",
-            y="value",
-            color="variable",
-            title="Средняя цена продажи vs. закупочная по подкатегориям",
-            labels={"value": "Цена", "subcategory": "Подкатегория", "variable": "Тип"},
-            barmode="group"
-        )
-        st.plotly_chart(fig_prices, use_container_width=True)
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Всего уникальных товаров", df["Артикул"].nunique())
+    col2.metric("Суммарная выручка", f"{df['Итого продаж'].sum():,.0f} грн")
+    col3.metric("Средняя цена продажи", f"{df['Средняя цена продажи'].mean():.2f} грн")
 
-        st.markdown("### 🏆 Топ-10 товаров по объему продаж")
-        top_sales = df[["title", "Итого продаж"]].dropna().sort_values("Итого продаж", ascending=False).head(10)
-        fig_top_products = px.bar(
-            top_sales,
-            x="title",
-            y="Итого продаж",
-            title="Топ-10 товаров по продажам",
-            labels={"Итого продаж": "грн", "title": "Товар"}
-        )
-        st.plotly_chart(fig_top_products, use_container_width=True)
+    st.markdown("### 📦 Количество товаров по категориям")
+    category_counts = df["category"].value_counts().reset_index()
+    category_counts.columns = ["Категория", "Количество"]
+
+    fig_category = px.bar(
+        category_counts.sort_values("Количество", ascending=False),
+        x="Категория",
+        y="Количество",
+        title="Количество товаров по категориям",
+    )
+    st.plotly_chart(fig_category, use_container_width=True)
+
+    st.markdown("### 💰 Средняя закупочная vs. продажная цена по подкатегориям")
+    by_subcat = df.groupby("subcategory").agg(
+        Средняя_цена_продажи=("Средняя цена продажи", "mean"),
+        Средняя_закупка=("закупочная цена", "mean")
+    ).dropna().round(2).reset_index()
+
+    fig_prices = px.bar(
+        by_subcat.melt(id_vars="subcategory", value_vars=["Средняя_цена_продажи", "Средняя_закупка"]),
+        x="subcategory",
+        y="value",
+        color="variable",
+        title="Средняя цена продажи vs. закупочная по подкатегориям",
+        labels={"value": "Цена", "subcategory": "Подкатегория", "variable": "Тип"},
+        barmode="group"
+    )
+    st.plotly_chart(fig_prices, use_container_width=True)
+
+    st.markdown("### 🏆 Топ-10 товаров по объему продаж")
+    top_sales = df[["title", "Итого продаж"]].dropna().sort_values("Итого продаж", ascending=False).head(10)
+
+    fig_top_products = px.bar(
+        top_sales,
+        x="title",
+        y="Итого продаж",
+        title="Топ-10 товаров по продажам",
+        labels={"Итого продаж": "грн", "title": "Товар"}
+    )
+    st.plotly_chart(fig_top_products, use_container_width=True)
+
