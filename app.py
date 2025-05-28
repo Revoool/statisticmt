@@ -82,16 +82,22 @@ with tab1:
     subcat = st.selectbox("Подкатегория", df["subcategory"].dropna().unique())
     filtered = df[df["subcategory"] == subcat]
 
-    st.dataframe(filtered[[
+    expected_cols = [
         "Артикул", 
         "Поставщик",
         "title", 
         "subcategory",
-        "Первая цена за период",
-        "Последняя цена за период",
-        "Изменение цены в гривнах",
+        "Первая цена за период", 
+        "Последняя цена за период", 
+        "Изменение цены в гривнах", 
         "Изменение цены %"
-    ]])
+    ]
+    available_cols = [col for col in expected_cols if col in filtered.columns]
+
+    if not available_cols:
+        st.warning("В выбранной подкатегории нет нужных колонок для анализа.")
+    else:
+        st.dataframe(filtered[available_cols])
 
 
 with tab2:
