@@ -242,7 +242,7 @@ with tab4:
 
     import plotly.express as px
     fig2 = px.bar(
-        df_summary.sort_values("Общая прибыль", ascending=False).head(20),  # top 20
+        df_summary.sort_values("Общая прибыль", ascending=False).head(20),
         x="Наименование поставщика",
         y="Общая прибыль",
         title="📦 Прибыль по подкатегориям",
