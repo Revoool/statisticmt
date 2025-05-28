@@ -205,3 +205,30 @@ with tab3:
         labels={"Среднее_изменение_цены_проц": "%"},
     )
     st.plotly_chart(fig5, use_container_width=True)
+
+with st.tab("Итоги по поставщикам"):
+    st.title("Итоги по поставщикам")
+
+    df_suppliers = df.dropna(subset=["Поставщик"])
+
+    grouped_suppliers = df_suppliers.groupby("Поставщик").agg(
+        Товаров=("Артикул", "count"),
+        Сумма_продаж=("Итого продаж", "sum"),
+        Средняя_цена_продажи=("Средняя цена продажи", "mean"),
+        Средняя_закупка=("закупочная цена", "mean"),
+    ).reset_index()
+
+    grouped_suppliers["Средняя_маржа"] = (
+        grouped_suppliers["Средняя_цена_продажи"] - grouped_suppliers["Средняя_закупка"]
+    ).round(2)
+
+    st.dataframe(grouped_suppliers.sort_values("Сумма_продаж", ascending=False))
+
+    fig_supplier_profit = px.bar(
+        grouped_suppliers.sort_values("Сумма_продаж", ascending=False).head(20),
+        x="Поставщик",
+        y="Сумма_продаж",
+        title="💰 Топ-20 поставщиков по выручке",
+        labels={"Сумма_продаж": "грн"},
+    )
+    st.plotly_chart(fig_supplier_profit)
