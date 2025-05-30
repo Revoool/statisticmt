@@ -29,6 +29,9 @@ def parse_price(value):
         return None
 
 price_columns = [col for col in df.columns if "_цена" in col]
+qty_columns = [col for col in df.columns if "_шт" in col]
+df["Общее количество продаж (шт)"] = df[qty_columns].apply(pd.to_numeric, errors="coerce").sum(axis=1)
+
 for col in price_columns:
     df[col] = df[col].apply(parse_price)
 
@@ -112,7 +115,8 @@ with tab1:
         "Первая цена за период", 
         "Последняя цена за период", 
         "Изменение цены в гривнах", 
-        "Изменение цены %"
+        "Изменение цены %",
+        "Общее количество продаж (шт)"
     ]
     available_cols = [col for col in expected_cols if col in filtered.columns]
 
