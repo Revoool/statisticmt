@@ -51,7 +51,14 @@ def get_last_price(row):
 df["Первая цена за период (recalc)"] = df.apply(get_first_price, axis=1)
 df["Последняя цена за период (recalc)"] = df.apply(get_last_price, axis=1)
 df["Изменение цены в гривнах (recalc)"] = df["Последняя цена за период (recalc)"] - df["Первая цена за период (recalc)"]
-df["Изменение цены % (recalc)"] = (df["Изменение цены в гривнах (recalc)"] / df["Первая цена за период (recalc)"] * 100).round(2)
+# df["Изменение цены % (recalc)"] = (df["Изменение цены в гривнах (recalc)"] / df["Первая цена за период (recalc)"] * 100).round(2)
+
+df["Изменение цены % (recalc)"] = df.apply(
+    lambda row: ((row["Изменение цены в гривнах (recalc)"] / row["Первая цена за период (recalc)"]) * 100)
+    if pd.notnull(row["Первая цена за период (recalc)"]) and row["Первая цена за период (recalc)"] != 0
+    else None,
+    axis=1
+).round(2)
 
 
 
