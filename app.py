@@ -84,8 +84,11 @@ with tab1:
 
     if "Поставщик" in filtered.columns:
         suppliers = filtered["Поставщик"].dropna().unique()
-        supplier = st.selectbox("Поставщик", suppliers)
-        filtered = filtered[filtered["Поставщик"] == supplier]
+        supplier_options = ["Все"] + list(suppliers)
+        selected_supplier = st.selectbox("Поставщик", supplier_options)
+
+        if selected_supplier != "Все":
+            filtered = filtered[filtered["Поставщик"] == selected_supplier]
 
     expected_cols = [
         "Артикул", 
