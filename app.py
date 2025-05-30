@@ -79,9 +79,16 @@ with tab1:
         st.error("Колонка 'subcategory' не найдена.")
         st.stop()
 
-    subcat = st.selectbox("Подкатегория", df["subcategory"].dropna().unique())
-    filtered = df[df["subcategory"] == subcat]
+    # Добавляем "Все" в список подкатегорий
+    subcategories = df["subcategory"].dropna().unique()
+    subcat_options = ["Все"] + list(subcategories)
+    selected_subcat = st.selectbox("Подкатегория", subcat_options)
 
+    if selected_subcat != "Все":
+        filtered = df[df["subcategory"] == selected_subcat]
+    else:
+        filtered = df.copy()
+        
     if "Поставщик" in filtered.columns:
         suppliers = filtered["Поставщик"].dropna().unique()
         supplier_options = ["Все"] + list(suppliers)
@@ -103,7 +110,7 @@ with tab1:
     available_cols = [col for col in expected_cols if col in filtered.columns]
 
     if not available_cols:
-        st.warning("В выбранной подкатегории нет нужных колонок для анализа.")
+        st.warning("В выбранных фильтрах нет нужных колонок для анализа.")
     else:
         st.dataframe(filtered[available_cols])
 
